@@ -1,0 +1,49 @@
+{
+  "isin": "IE00B4L5Y983",
+  "fetched_at": "2026-09-19T20:30:05.007275+00:00",
+  "sources": {
+    "yahoo": {
+      "ticker": "IWDA.L",
+      "currency": "USD",
+      "exchange": "LSE",
+      "n_bars": 21,
+      "sample_last_5": [
+        { "date": "2024-09-24", "close": 107.13, "source": "yahoo" },
+        { "date": "2024-09-25", "close": 107.18, "source": "yahoo" },
+        { "date": "2024-09-26", "close": 107.68, "source": "yahoo" },
+        { "date": "2024-09-27", "close": 107.9, "source": "yahoo" },
+        { "date": "2024-09-30", "close": 107.42, "source": "yahoo" }
+      ]
+    },
+    "justetf": {
+      "name": "iShares Core MSCI World UCITS ETF USD (Acc)",
+      "ter": "0.20% p.a.",
+      "currency": "USD",
+      "distribution": "Accumulating",
+      "replication": "Physical"
+    },
+    "openfigi": [
+      {
+        "figi": "BBG000P71QK5",
+        "name": "ISHARES CORE MSCI WORLD",
+        "ticker": "IWDA",
+        "exchCode": "NA",
+        "securityType": "ETP"
+      },
+      {
+        "figi": "BBG000PH98P0",
+        "name": "ISHARES CORE MSCI WORLD",
+        "ticker": "SWDA",
+        "exchCode": "LN",
+        "securityType": "ETP"
+      }
+    ],
+    "quefondos": {
+      "name": "ISHARES CORE MSCI WORLD UCITS ETF USD (ACC)",
+      "found": true
+    },
+    "investing": { "status": "blocked_403" },
+    "morningstar_direct": { "status": "paid_api_only" },
+    "ft": { "status": "search_only_no_free_series" }
+  }
+}
