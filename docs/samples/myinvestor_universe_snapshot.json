@@ -1,1 +1,21 @@
-PLACEHOLDER
+{
+  "source": "MyInvestor connector get_funds",
+  "fetched_at": "2026-09-19T20:41:11Z",
+  "cash_isin": "FR0000989626",
+  "n_funds": 12,
+  "note": "price_series siempre null. NAV + rentabilidades agregadas sí.",
+  "funds": [
+    {"isin": "IE00BYX5MX67", "name": "Fidelity S&P 500 Index Fund P-ACC-EUR", "ter": 0.1, "nav": 16.4405, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 14.73, "return_1y": 20.34, "return_3y": 17.84, "return_5y": 13.09, "volatility_3y": 13.04, "risk_indicator": 4, "mstar_rating": 4, "aum": 2362439589, "management_company": "Fidelity International"},
+    {"isin": "IE00BYX5MD61", "name": "Fidelity MSCI Europe Index Fund P-ACC-EUR", "ter": 0.1, "nav": 10.7942, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 11.08, "return_1y": 19.52, "return_3y": 14.52, "return_5y": 10.18, "volatility_3y": 10.41, "risk_indicator": 4, "mstar_rating": 4, "aum": 263663385, "management_company": "Fidelity International"},
+    {"isin": "IE00BDRK7R97", "name": "iShares Pacific Index Fund (IE) D Acc EUR", "ter": 0.15, "nav": 18.514, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 14.7, "return_1y": 14.84, "return_3y": 12.7, "return_5y": 7.4, "volatility_3y": 11.54, "risk_indicator": 5, "mstar_rating": 4, "aum": 731000000, "management_company": "BlackRock"},
+    {"isin": "IE00BYWYCC39", "name": "iShares Emerging Markets Index Fund (IE) D Acc EUR", "ter": 0.2, "nav": 19.81, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 25.4, "return_1y": 32.03, "return_3y": 19.5, "return_5y": 8.6, "volatility_3y": 15.71, "risk_indicator": 5, "mstar_rating": 3, "aum": 8399000000, "management_company": "BlackRock"},
+    {"isin": "IE00B42W3S00", "name": "Vanguard Global Small-Cap Index Fund EUR Acc", "ter": 0.3, "nav": 443.6166, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 16.6, "return_1y": 19.48, "return_3y": 14.5, "return_5y": 7.2, "volatility_3y": 14.57, "risk_indicator": 4, "mstar_rating": 4, "aum": 6939000000, "management_company": "Vanguard"},
+    {"isin": "LU1278917452", "name": "DWS Invest CROCI Sectors Plus LC", "ter": 1.49, "nav": 291.74, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 17.0, "return_1y": 22.76, "return_3y": 6.3, "return_5y": 7.9, "volatility_3y": 12.73, "risk_indicator": 4, "mstar_rating": 3, "aum": 420000000, "management_company": "DWS"},
+    {"isin": "ES0165265002", "name": "MyInvestor Nasdaq 100", "ter": 0.4, "nav": 1.677, "nav_date": "2026-09-16", "currency": "EUR", "ytd": 16.78, "return_1y": 23.06, "return_3y": 20.21, "return_5y": 9.41, "volatility_3y": 18.94, "risk_indicator": 4, "mstar_rating": 3, "aum": 132103444, "management_company": "MyInvestor"},
+    {"isin": "FR0000989626", "name": "Groupama Trésorerie IC", "ter": 0.15, "nav": 44571.44, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 1.55, "return_1y": 2.17, "return_3y": 3.03, "return_5y": 2.22, "volatility_3y": 0.26, "risk_indicator": 1, "mstar_rating": null, "aum": 6877539201, "management_company": "Groupama", "role": "cash"},
+    {"isin": "IE00BYX5N771", "name": "Fidelity MSCI Japan Index Fund P-ACC-EUR", "ter": 0.1, "nav": 10.6141, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 24.6, "return_1y": 29.26, "return_3y": 16.2, "return_5y": 9.1, "volatility_3y": 13.13, "risk_indicator": 4, "mstar_rating": 3, "aum": 448000000, "management_company": "Fidelity International"},
+    {"isin": "IE0007472990", "name": "Vanguard Euro Government Bond Index Fund EUR Acc", "ter": 0.12, "nav": 210.6952, "nav_date": "2026-09-17", "currency": "EUR", "ytd": -2.44, "return_1y": -2.15, "return_3y": 2.03, "return_5y": -2.89, "volatility_3y": 4.85, "risk_indicator": 3, "mstar_rating": 3, "aum": 8044573384, "management_company": "Vanguard"},
+    {"isin": "IE0007471927", "name": "Vanguard U.S. Government Bond Index Fund USD Acc", "ter": 0.12, "nav": 198.5216, "nav_date": "2026-09-17", "currency": "USD", "ytd": 0.82, "return_1y": 1.85, "return_3y": 0.66, "return_5y": -0.58, "volatility_3y": 6.11, "risk_indicator": 3, "mstar_rating": 3, "aum": 5666266186, "management_company": "Vanguard"},
+    {"isin": "LU1578889864", "name": "NINETY GLOBAL GOLD A ACC EUR", "ter": 2.0, "nav": 70.07, "nav_date": "2026-09-17", "currency": "EUR", "ytd": 6.05, "return_1y": 42.8, "return_3y": 47.18, "return_5y": 23.51, "volatility_3y": 41.15, "risk_indicator": 6, "mstar_rating": null, "aum": 1119243508, "management_company": "Ninety One"}
+  ]
+}
