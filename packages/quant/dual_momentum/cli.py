@@ -1,6 +1,7 @@
-"""CLI local — backtest Modelo H sin Supabase/Netlify."""
+"""CLI local — backtest Modelo H + snapshot MyInvestor."""
 from __future__ import annotations
 import argparse, json, sys
+from pathlib import Path
 from typing import Optional
 import pandas as pd
 
@@ -75,10 +76,29 @@ def cmd_backtest(args: argparse.Namespace) -> int:
         print(f"JSON → {args.out_json}")
     return 0
 
+def cmd_snapshot(args: argparse.Namespace) -> int:
+    from dual_momentum.myinvestor_cache import DEFAULT_ISINS, format_table, load_snapshot, missing_isins
+    try:
+        snap = load_snapshot(Path(args.path) if args.path else None)
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+    print(format_table(snap))
+    miss = missing_isins(snap, DEFAULT_ISINS)
+    if miss:
+        print(f"\nFaltan ({len(miss)}): {', '.join(miss)}")
+        return 2
+    print(f"\nUniverso completo: {len(DEFAULT_ISINS)} ISINs OK")
+    if args.out_json:
+        slim = {k: v for k, v in snap.items() if not k.startswith("_")}
+        open(args.out_json, "w", encoding="utf-8").write(json.dumps(slim, indent=2, ensure_ascii=False))
+        print(f"Copia → {args.out_json}")
+    return 0
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="dual_momentum")
     sub = p.add_subparsers(dest="cmd", required=True)
-    b = sub.add_parser("backtest")
+    b = sub.add_parser("backtest", help="Backtest Modelo H (Yahoo)")
     b.add_argument("--tickers", required=True)
     b.add_argument("--isins", required=True)
     b.add_argument("--cash-isin", required=True)
@@ -91,6 +111,10 @@ def main(argv=None) -> int:
     b.add_argument("--threshold", type=float, default=0.5)
     b.add_argument("--out-json", default=None)
     b.set_defaults(func=cmd_backtest)
+    s = sub.add_parser("snapshot", help="Fichas MyInvestor en caché local")
+    s.add_argument("--path", default=None)
+    s.add_argument("--out-json", default=None)
+    s.set_defaults(func=cmd_snapshot)
     args = p.parse_args(argv)
     return args.func(args)
 
