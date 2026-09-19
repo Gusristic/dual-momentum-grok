@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "cash_isin": "FR0000989626",
+  "cash_name": "Groupama Trésorerie IC",
+  "model_h": { "w12": 0.5, "w6": 0.3, "w3": 0.2, "rotation_threshold_pct": 0.5 },
+  "universe": [
+    { "isin": "IE00BYX5MX67", "name": "Fidelity S&P 500 Index EUR P Acc", "asset_class": "equity_us" },
+    { "isin": "IE00BYX5MD61", "name": "Fidelity MSCI Europe Indx EUR P Acc", "asset_class": "equity_europe" },
+    { "isin": "IE00BDRK7R97", "name": "iShares Pacific Index (IE) D Acc EUR", "asset_class": "equity_pacific" },
+    { "isin": "IE00BYWYCC39", "name": "iShares EmergMkts Idx (IE) D Acc EUR", "asset_class": "equity_em" },
+    { "isin": "IE00B42W3S00", "name": "Vanguard Global Small-Cap Index Fund EUR Acc", "asset_class": "equity_small_global" },
+    { "isin": "LU1278917452", "name": "DWS Invest CROCI Sectors Plus LC", "asset_class": "equity_active" },
+    { "isin": "ES0165265002", "name": "Myinvestor Nasdaq 100 FI", "asset_class": "equity_nasdaq" },
+    { "isin": "FR0000989626", "name": "Groupama Trésorerie IC", "asset_class": "cash_money_market" },
+    { "isin": "IE00BYX5N771", "name": "Fidelity Japan Index Fund P-ACC-EUR", "asset_class": "equity_japan" },
+    { "isin": "IE0007472990", "name": "Vanguard € Govt Bd Idx € Acc", "asset_class": "bond_gov_eur" },
+    { "isin": "IE0007471927", "name": "Vanguard U.S. Govt Bd Idx $ Acc", "asset_class": "bond_gov_usd" },
+    { "isin": "LU1578889864", "name": "Ninety One GSF Glb Gold A Acc EUR H", "asset_class": "gold_eur_hedged" }
+  ],
+  "price_data_note": "Yahoo: sin serie para estos fondos IIC. NAV export requerido. No inventar tickers.",
+  "verified_openfigi": "2026-09-19"
+}
