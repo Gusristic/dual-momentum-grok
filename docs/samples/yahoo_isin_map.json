@@ -1,0 +1,23 @@
+{
+  "verified": "2026-09-19",
+  "cash_isin": "FR0000989626",
+  "map": {
+    "IE00BYX5MX67": "0P0001CLDM.F",
+    "IE00BYX5MD61": "0P0001CJGN.F",
+    "IE00BDRK7R97": "0P0001AN9J.F",
+    "IE00BYWYCC39": "0P0001AINL.F",
+    "IE00B42W3S00": "0P00012I66.F",
+    "LU1278917452": "0P000172KL.F",
+    "ES0165265002": "0P0001MRGW.F",
+    "FR0000989626": "0P00000LRT.F",
+    "IE00BYX5N771": "0P0001CLDI.F",
+    "IE0007472990": "0P00000RQE.F",
+    "IE0007471927": "0P00000RNB",
+    "LU1578889864": "0P0001A2G4.F"
+  },
+  "notes": [
+    "Series mensuales via chart?interval=1mo",
+    "IE0007471927 en USD sin conversión FX",
+    "CROCI Yahoo NAV puede diferir ligeramente de MyInvestor"
+  ]
+}
