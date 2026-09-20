@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dual Momentum — Modelo H</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Dual Momentum</div>
+      <nav>
+        <a href="#signal" class="nav-link active" data-page="signal">Señal hoy</a>
+        <a href="#backtest" class="nav-link" data-page="backtest">Backtest</a>
+        <a href="#config" class="nav-link" data-page="config">Configuración</a>
+        <a href="#allocation" class="nav-link" data-page="allocation">Asignación</a>
+        <a href="#tax" class="nav-link" data-page="tax">Fiscalidad</a>
+        <a href="#about" class="nav-link" data-page="about">Info</a>
+      </nav>
+      <p class="aside-note">GitHub Pages · uso educativo</p>
+    </aside>
+    <main class="main">
+      <section id="page-signal" class="page active">
+        <h1>Señal hoy</h1>
+        <div class="card highlight">
+          <div class="label" id="signal-date">—</div>
+          <div class="title" id="signal-name">—</div>
+          <div class="mono muted" id="signal-isin">—</div>
+          <div class="chips" id="signal-chips"></div>
+          <p class="muted" id="signal-reason"></p>
+        </div>
+        <div class="grid3" id="signal-returns"></div>
+        <div class="card"><h2>Últimas rotaciones</h2><ul class="mono list" id="signal-history"></ul></div>
+      </section>
+      <section id="page-backtest" class="page">
+        <h1>Backtest</h1>
+        <div class="grid3" id="metrics-grid"></div>
+        <div class="warn"><strong>Aviso:</strong> CAGR orientativo.</div>
+        <div class="card"><h2>CLI</h2><pre>cd packages/quant
+python -m dual_momentum.cli universe</pre></div>
+        <div class="card"><h2>Mapa Yahoo</h2><ul class="mono list small" id="yahoo-map"></ul></div>
+      </section>
+      <section id="page-config" class="page">
+        <h1>Configuración</h1>
+        <div class="card">
+          <label class="lbl">ISINs</label>
+          <textarea id="cfg-isins" rows="12" class="mono"></textarea>
+          <div class="row">
+            <button type="button" id="btn-validate" class="btn">Validar</button>
+            <button type="button" id="btn-save" class="btn primary">Guardar</button>
+            <button type="button" id="btn-reset" class="btn">Default</button>
+          </div>
+          <ul class="mono list small" id="cfg-rows"></ul>
+        </div>
+        <div class="card"><label class="lbl">Cash</label><input id="cfg-cash" class="mono input" /></div>
+        <div class="card">
+          <div class="row weights">
+            <label>w12 <input type="number" step="0.01" id="cfg-w12" class="input num" /></label>
+            <label>w6 <input type="number" step="0.01" id="cfg-w6" class="input num" /></label>
+            <label>w3 <input type="number" step="0.01" id="cfg-w3" class="input num" /></label>
+            <label>Umbral% <input type="number" step="0.1" id="cfg-th" class="input num" /></label>
+          </div>
+          <p class="muted small" id="cfg-sum"></p>
+        </div>
+        <p class="muted" id="cfg-msg"></p>
+      </section>
+      <section id="page-allocation" class="page">
+        <h1>Asignación</h1>
+        <div class="card">
+          <div class="muted" id="alloc-date"></div>
+          <div class="title" id="alloc-name"></div>
+          <div class="bar"><div class="bar-fill"></div></div>
+          <div class="mono" id="alloc-isin"></div>
+        </div>
+      </section>
+      <section id="page-tax" class="page">
+        <h1>Fiscalidad</h1>
+        <ul class="bullets">
+          <li>Traspasos IIC: art. 94 LIRPF (diferimiento).</li>
+          <li>No es asesoramiento fiscal.</li>
+        </ul>
+      </section>
+      <section id="page-about" class="page">
+        <h1>Info</h1>
+        <ul class="bullets">
+          <li><a href="https://github.com/Gusristic/dual-momentum-grok">Repo</a></li>
+          <li>Señal embebida del último backtest local</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
