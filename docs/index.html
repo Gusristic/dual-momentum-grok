@@ -3,94 +3,201 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dual Momentum — Modelo H</title>
+  <title>Dual Momentum</title>
+  <meta name="description" content="Dual Momentum multi-modelo · datos Yahoo mensuales · GitHub Pages" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">Dual Momentum</div>
-      <nav>
-        <a href="#signal" class="nav-link active" data-page="signal">Señal hoy</a>
-        <a href="#backtest" class="nav-link" data-page="backtest">Backtest</a>
-        <a href="#config" class="nav-link" data-page="config">Configuración</a>
-        <a href="#allocation" class="nav-link" data-page="allocation">Asignación</a>
-        <a href="#tax" class="nav-link" data-page="tax">Fiscalidad</a>
-        <a href="#about" class="nav-link" data-page="about">Info</a>
-      </nav>
-      <p class="aside-note">GitHub Pages · uso educativo</p>
-    </aside>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <div>
+          <div class="brand-name">Dual Momentum</div>
+          <div class="brand-sub">GitHub Pages · datos Yahoo mensuales</div>
+        </div>
+      </div>
+      <div class="top-controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Modelo</span>
+          <select id="sel-model" class="select">
+            <option value="equilibrado" selected>Equilibrado 50-30-20</option>
+            <option value="m12">12M clásico</option>
+            <option value="m12_1">12-1M (skip month)</option>
+            <option value="agresivo">Agresivo 20-30-50</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Filtro cash</span>
+          <select id="sel-filter" class="select">
+            <option value="score" selected>A · Score ponderado vs cash</option>
+            <option value="r12">B · Solo R12 vs cash</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button type="button" class="tab active" data-page="decision">Decisión</button>
+      <button type="button" class="tab" data-page="ranking">Ranking</button>
+      <button type="button" class="tab" data-page="ventanas">Ventanas 12/6/3</button>
+      <button type="button" class="tab" data-page="backtest">Backtest</button>
+      <button type="button" class="tab" data-page="corr">Correlación</button>
+      <button type="button" class="tab" data-page="universo">Universo</button>
+      <button type="button" class="tab" data-page="info">Info</button>
+    </nav>
+
     <main class="main">
-      <section id="page-signal" class="page active">
-        <h1>Señal hoy</h1>
-        <div class="card highlight">
-          <div class="label" id="signal-date">—</div>
-          <div class="title" id="signal-name">—</div>
-          <div class="mono muted" id="signal-isin">—</div>
-          <div class="chips" id="signal-chips"></div>
-          <p class="muted" id="signal-reason"></p>
+      <section id="page-decision" class="page active">
+        <div class="page-head">
+          <h1>Señal y comparación</h1>
+          <p class="lede">Top-1 según modelo y filtro activos. Los 4 modelos se recalculan al cambiar el filtro cash.</p>
         </div>
-        <div class="grid3" id="signal-returns"></div>
-        <div class="card"><h2>Últimas rotaciones</h2><ul class="mono list" id="signal-history"></ul></div>
+        <div class="grid-models" id="decision-cards"></div>
+        <div class="card" id="decision-detail">
+          <h2>Por qué gana el modelo activo</h2>
+          <p id="decision-why" class="body-text">—</p>
+        </div>
       </section>
+
+      <section id="page-ranking" class="page">
+        <div class="page-head">
+          <h1>Clasificación</h1>
+          <p class="lede">Score del modelo activo · elegibilidad según filtro cash · nombres (no solo ISIN).</p>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="rank-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Fondo</th>
+                <th class="num">Score</th>
+                <th class="num">R12</th>
+                <th class="num">R6</th>
+                <th class="num">R3</th>
+                <th>Filtro</th>
+                <th>Δ vs 2º</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="page-ventanas" class="page">
+        <div class="page-head">
+          <h1>Evolución 12M · 6M · 3M</h1>
+          <p class="lede">Retornos mensuales acumulados desde Yahoo (última fecha disponible). Para verificar datos, no inventados.</p>
+        </div>
+        <p class="meta-line" id="ventanas-asof">—</p>
+        <div class="table-wrap">
+          <table class="data-table" id="ventanas-table">
+            <thead>
+              <tr>
+                <th>Fondo</th>
+                <th class="num">R12</th>
+                <th class="num">R6</th>
+                <th class="num">R3</th>
+                <th class="num">Score eq.</th>
+                <th class="num">Pts NAV</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
       <section id="page-backtest" class="page">
-        <h1>Backtest</h1>
-        <div class="grid3" id="metrics-grid"></div>
-        <div class="warn"><strong>Aviso:</strong> CAGR orientativo.</div>
-        <div class="card"><h2>CLI</h2><pre>cd packages/quant
-python -m dual_momentum.cli universe</pre></div>
-        <div class="card"><h2>Mapa Yahoo</h2><ul class="mono list small" id="yahoo-map"></ul></div>
-      </section>
-      <section id="page-config" class="page">
-        <h1>Configuración</h1>
-        <div class="card">
-          <label class="lbl">ISINs</label>
-          <textarea id="cfg-isins" rows="12" class="mono"></textarea>
-          <div class="row">
-            <button type="button" id="btn-validate" class="btn">Validar</button>
-            <button type="button" id="btn-save" class="btn primary">Guardar</button>
-            <button type="button" id="btn-reset" class="btn">Default</button>
-          </div>
-          <ul class="mono list small" id="cfg-rows"></ul>
+        <div class="page-head">
+          <h1>Backtest</h1>
+          <p class="lede">Equity desde el primer rebalance válido (mes ≥13). Métricas del modelo y filtro seleccionados.</p>
         </div>
-        <div class="card"><label class="lbl">Cash</label><input id="cfg-cash" class="mono input" /></div>
-        <div class="card">
-          <div class="row weights">
-            <label>w12 <input type="number" step="0.01" id="cfg-w12" class="input num" /></label>
-            <label>w6 <input type="number" step="0.01" id="cfg-w6" class="input num" /></label>
-            <label>w3 <input type="number" step="0.01" id="cfg-w3" class="input num" /></label>
-            <label>Umbral% <input type="number" step="0.1" id="cfg-th" class="input num" /></label>
-          </div>
-          <p class="muted small" id="cfg-sum"></p>
+        <div class="metrics-row" id="bt-metrics"></div>
+        <div class="card chart-card">
+          <canvas id="bt-chart" height="220"></canvas>
         </div>
-        <p class="muted" id="cfg-msg"></p>
-      </section>
-      <section id="page-allocation" class="page">
-        <h1>Asignación</h1>
-        <div class="card">
-          <div class="muted" id="alloc-date"></div>
-          <div class="title" id="alloc-name"></div>
-          <div class="bar"><div class="bar-fill"></div></div>
-          <div class="mono" id="alloc-isin"></div>
+        <div class="warn">
+          <strong>Aviso:</strong> series cortas y rachas (p. ej. oro) pueden inflar CAGR. Uso educativo, no promesa de rentabilidad.
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="bt-history">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Posición</th>
+                <th>Rotó</th>
+                <th class="num">Score</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </section>
-      <section id="page-tax" class="page">
-        <h1>Fiscalidad</h1>
-        <ul class="bullets">
-          <li>Traspasos IIC: art. 94 LIRPF (diferimiento).</li>
-          <li>No es asesoramiento fiscal.</li>
-        </ul>
+
+      <section id="page-corr" class="page">
+        <div class="page-head">
+          <h1>Matriz de correlación</h1>
+          <p class="lede">Retornos mensuales solapados (mín. 24 meses). Solo fondos activos en el universo.</p>
+        </div>
+        <div class="table-wrap" id="corr-wrap"></div>
       </section>
-      <section id="page-about" class="page">
-        <h1>Info</h1>
-        <ul class="bullets">
-          <li><a href="https://github.com/Gusristic/dual-momentum-grok">Repo</a></li>
-          <li>Señal embebida del último backtest local</li>
-        </ul>
+
+      <section id="page-universo" class="page">
+        <div class="page-head">
+          <h1>Universo / slots</h1>
+          <p class="lede">Activa o desactiva fondos. El cash no se puede desactivar. Los cambios recalculan señales y backtest.</p>
+        </div>
+        <div class="card">
+          <h2>Instrucciones</h2>
+          <ul class="bullets">
+            <li>Marca/desmarca el interruptor de cada fondo para incluirlo o excluirlo del ranking y del backtest.</li>
+            <li>El cash (Groupama Trésorerie) es el puerto seguro del filtro absoluto; siempre activo.</li>
+            <li>Para añadir un ISIN nuevo hace falta serie Yahoo en <code>nav_monthly.json</code> (pipeline CLI); aquí solo se gestionan los 12 cargados.</li>
+            <li>Preferencias se guardan en este navegador (localStorage).</li>
+          </ul>
+        </div>
+        <div class="slots" id="slots-list"></div>
+      </section>
+
+      <section id="page-info" class="page">
+        <div class="page-head">
+          <h1>Reglas y fuentes</h1>
+        </div>
+        <div class="card">
+          <h2>4 modelos (score de ranking)</h2>
+          <ul class="bullets">
+            <li><strong>12M</strong>: score = R12</li>
+            <li><strong>12-1M</strong>: score = precio<sub>t−1</sub> / precio<sub>t−12</sub> − 1 (omite el mes más reciente)</li>
+            <li><strong>Equilibrado</strong> (defecto): 0,50·R12 + 0,30·R6 + 0,20·R3</li>
+            <li><strong>Agresivo</strong>: 0,20·R12 + 0,30·R6 + 0,50·R3</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Filtro de elegibilidad vs cash</h2>
+          <ul class="bullets">
+            <li><strong>A · Score ponderado</strong>: score(activo) > score(cash) con la misma fórmula del modelo (lo más habitual en quants multi-horizonte).</li>
+            <li><strong>B · Solo R12</strong>: R12(activo) > R12(cash) (estilo Antonacci clásico).</li>
+            <li>Si nadie pasa el filtro → 100% cash.</li>
+            <li>Asignación: top-1 = 100%. Umbral de rotación 0,5% en score.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Datos</h2>
+          <ul class="bullets">
+            <li>NAV mensuales: Yahoo Finance chart API <code>interval=1mo</code>, tickers <code>0P000….F</code>.</li>
+            <li>No se inventan precios ni retornos. Si faltan puntos para una ventana, el fondo queda fuera ese mes.</li>
+            <li>Repo: <a href="https://github.com/Gusristic/dual-momentum-grok" target="_blank" rel="noopener">dual-momentum-grok</a></li>
+          </ul>
+          <p class="muted small">Disclaimer: uso educativo. No es asesoramiento financiero ni fiscal.</p>
+        </div>
       </section>
     </main>
   </div>
-  <script src="data.js"></script>
+  <script src="meta.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
