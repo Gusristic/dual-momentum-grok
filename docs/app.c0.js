@@ -135,18 +135,3 @@
       if (holding == null) {
         rotated = true; reason = 'primera asignación · ' + reason; holding = target;
       } else if (target === holding) {
-        rotated = false; reason = 'mantener (mismo top-1)';
-      } else {
-        const mNew = scoreAt(modelId, target, i), mOld = scoreAt(modelId, holding, i);
-        if (mOld == null || mNew == null) {
-          rotated = true; reason = 'rotar (dato ausente)'; holding = target;
-        } else if (mNew - mOld > META.rotationThreshold) {
-          rotated = true;
-          reason = 'rotar · Δ ' + (mNew - mOld).toFixed(4) + ' > umbral';
-          holding = target;
-        } else {
-          rotated = false;
-          reason = 'mantener · Δ ' + (mNew - mOld).toFixed(4) + ' ≤ umbral';
-          target = holding;
-        }
-      }
