@@ -11,9 +11,15 @@
   const short = (isin) => META.short[isin] || META.names[isin] || isin;
 
   async function loadNav() {
-    const res = await fetch('nav_monthly.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('No se pudo cargar nav_monthly.json');
-    NAV = await res.json();
+    const manRes = await fetch('nav/manifest.json', { cache: 'no-store' });
+    if (!manRes.ok) throw new Error('No se pudo cargar nav/manifest.json');
+    const isins = await manRes.json();
+    NAV = {};
+    await Promise.all(isins.map(async (isin) => {
+      const r = await fetch('nav/' + isin + '.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error('Falta serie NAV: ' + isin);
+      NAV[isin] = await r.json();
+    }));
     const monthMaps = {}, monthSet = new Set();
     for (const isin of Object.keys(NAV)) {
       const m = {};
@@ -135,3 +141,5 @@
       if (holding == null) {
         rotated = true; reason = 'primera asignación · ' + reason; holding = target;
       } else if (target === holding) {
+        rotated = false; reason = 'mantener (mismo top-1)';
+      } else {
