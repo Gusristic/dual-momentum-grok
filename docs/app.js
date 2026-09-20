@@ -1,10 +1,5 @@
 (function(){
-  function load(src){return fetch(src).then(r=>r.text());}
-  Promise.all([load('app.p1.js'),load('app.p2.js')]).then(([a,b])=>{
-    const s=document.createElement('script');
-    s.textContent=a+b;
-    document.body.appendChild(s);
-  }).catch(e=>{
-    document.querySelector('.main').innerHTML='<div class="warn">Error cargando motor: '+e+'</div>';
-  });
+  Promise.all(['app.c0.js','app.c1.js','app.c2.js','app.c3.js'].map(s=>fetch(s).then(r=>r.text())))
+    .then(parts=>{ const s=document.createElement('script'); s.textContent=parts.join(''); document.body.appendChild(s); })
+    .catch(e=>{ document.querySelector('.main').innerHTML='<div class="warn">Error: '+e+'</div>'; });
 })();
