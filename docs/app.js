@@ -1,5 +1,5 @@
 (function(){
-  Promise.all(['eng1.js','eng2.js'].map(s=>fetch(s).then(r=>r.text())))
+  Promise.all(['m1.js','m2.js'].map(s=>fetch(s).then(r=>r.text())))
     .then(parts=>{const s=document.createElement('script');s.textContent=parts.join('');document.body.appendChild(s);})
     .catch(e=>{document.querySelector('.main').innerHTML='<div class="warn">Error: '+e+'</div>';});
 })();
