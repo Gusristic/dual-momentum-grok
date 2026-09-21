@@ -1,6 +1,3 @@
-    el.querySelectorAll('.toggle:not([disabled])').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const isin = btn.getAttribute('data-isin');
         state.active[isin] = !(state.active[isin] !== false);
         saveSlots(); renderAll();
       });
@@ -38,23 +35,6 @@
     if (tk) tk.addEventListener('change', (e) => {
       state.topK = parseInt(e.target.value, 10) === 2 ? 2 : 1;
       saveUi(); renderAll();
-    });
-    const copyBtn = document.getElementById('checklist-copy');
-    if (copyBtn) copyBtn.addEventListener('click', () => {
-      const line = buildChecklistLine();
-      if (!line) return;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(line).then(() => {
-          copyBtn.textContent = 'Copiado';
-          setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
-        });
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = line; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); copyBtn.textContent = 'Copiado'; } catch (e) {}
-        document.body.removeChild(ta);
-        setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
-      }
     });
   }
 
