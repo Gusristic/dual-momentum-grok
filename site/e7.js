@@ -1,16 +1,10 @@
-      if (!line) return;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(line).then(() => {
-          copyBtn.textContent = 'Copiado';
-          setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
-        });
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = line; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); copyBtn.textContent = 'Copiado'; } catch (e) {}
-        document.body.removeChild(ta);
-        setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
-      }
+    document.getElementById('sel-filter').addEventListener('change', (e) => {
+      state.filter = e.target.value; saveUi(); renderAll();
+    });
+    const tk = document.getElementById('sel-topk');
+    if (tk) tk.addEventListener('change', (e) => {
+      state.topK = parseInt(e.target.value, 10) === 2 ? 2 : 1;
+      saveUi(); renderAll();
     });
   }
 
