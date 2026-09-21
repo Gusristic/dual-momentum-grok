@@ -18,6 +18,11 @@
     }
     .btn-preset:hover { border-color: #3d9cf0; background: #1e2a3d; }
     .btn-preset.active { border-color: #3d9cf0; background: rgba(61,156,240,.15); color: #7ec4ff; }
+    .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px 16px; margin: 12px 0; }
+    .checklist-grid .k { display: block; font-size: 11px; color: #5c6b80; text-transform: uppercase; letter-spacing: .04em; }
+    .checklist-grid .v { font-size: 14px; font-weight: 600; color: #e8eef7; }
+    .checklist-export { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; margin-top: 12px; }
+    .checklist-line { display: block; flex: 1; min-width: 200px; padding: 10px 12px; background: #121820; border-radius: 8px; font-size: 11px; line-height: 1.45; color: #8b9bb0; word-break: break-all; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -78,6 +83,15 @@
           <h2>Por qué gana el modelo activo</h2>
           <p id="decision-why" class="body-text">—</p>
         </div>
+        <div class="card" id="checklist-card">
+          <h2>Checklist mensual</h2>
+          <p class="muted small">Misma lógica que la señal activa. Copia la línea para tu registro / Excel.</p>
+          <div id="checklist-box" class="checklist-box">—</div>
+          <div class="checklist-export">
+            <code id="checklist-line" class="checklist-line">—</code>
+            <button type="button" class="btn-preset" id="checklist-copy">Copiar línea</button>
+          </div>
+        </div>
       </section>
 
       <section id="page-ranking" class="page">
@@ -133,6 +147,11 @@
           <p class="lede">Equity desde el primer rebalance válido (mes ≥13). Métricas del modelo, filtro y asignación (Top-1 / Top-2) seleccionados.</p>
         </div>
         <div class="metrics-row" id="bt-metrics"></div>
+        <div class="card">
+          <h2>Comparativa de escenarios</h2>
+          <p class="muted small">Misma fecha de fin, mismos datos Yahoo. Modelo equilibrado. El filtro cash es el seleccionado arriba.</p>
+          <div class="table-wrap" id="scenario-table"></div>
+        </div>
         <div class="card chart-card">
           <canvas id="bt-chart" height="220"></canvas>
         </div>
@@ -240,43 +259,22 @@
       'IE00BYX5N771','IE0007472990','IE0007471927','LU1578889864'
     ];
     var PRESETS = {
-      all: {
-        label: 'Todos (12)',
-        on: ALL,
-        hint: 'Universo completo: RV regional + estilos + bonos + oro + cash.'
-      },
-      gem: {
-        label: 'GEM-like',
-        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BYWYCC39','IE0007472990','FR0000989626'],
-        hint: 'S&P 500 + Europe + EM + € Govt Bond + Cash. Cercano a dual momentum clásico (pocos bloques).'
-      },
-      no_gold: {
-        label: 'Multi-asset sin oro',
-        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','IE0007472990','FR0000989626'],
-        hint: 'Sin Gold, Nasdaq, CROCI ni US Govt $. Menos solapes y menos riesgo de rachas extremas.'
-      },
-      equity_only: {
-        label: 'Solo RV + cash',
-        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','FR0000989626'],
-        hint: 'Solo renta variable regional/estilo + cash. Sin bonos ni oro.'
-      }
+      all: { label: 'Todos (12)', on: ALL, hint: 'Universo completo: RV regional + estilos + bonos + oro + cash.' },
+      gem: { label: 'GEM-like', on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BYWYCC39','IE0007472990','FR0000989626'], hint: 'S&P 500 + Europe + EM + € Govt Bond + Cash.' },
+      no_gold: { label: 'Multi-asset sin oro', on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','IE0007472990','FR0000989626'], hint: 'Sin Gold, Nasdaq, CROCI ni US Govt $.' },
+      equity_only: { label: 'Solo RV + cash', on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','FR0000989626'], hint: 'Solo renta variable regional/estilo + cash.' }
     };
-
     function applyPreset(id) {
       var p = PRESETS[id];
       if (!p) return;
       var active = {};
-      ALL.forEach(function (isin) {
-        active[isin] = p.on.indexOf(isin) >= 0 || isin === CASH;
-      });
+      ALL.forEach(function (isin) { active[isin] = p.on.indexOf(isin) >= 0 || isin === CASH; });
       active[CASH] = true;
       localStorage.setItem(STORAGE, JSON.stringify(active));
       localStorage.setItem('dm_v2_preset', id);
-      var hash = location.hash || '#universo';
-      location.hash = hash;
+      location.hash = location.hash || '#universo';
       location.reload();
     }
-
     function markActive() {
       var cur = localStorage.getItem('dm_v2_preset') || '';
       document.querySelectorAll('.btn-preset').forEach(function (btn) {
@@ -288,7 +286,6 @@
         }
       });
     }
-
     document.addEventListener('DOMContentLoaded', function () {
       var row = document.getElementById('preset-row');
       if (!row) return;
@@ -301,6 +298,5 @@
     });
   })();
   </script>
-
 </body>
 </html>
