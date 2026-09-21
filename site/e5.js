@@ -1,20 +1,3 @@
-        (META.yahooMap[isin] || '—') + '</div></div>' +
-        '<div class="num muted small">' + ((NAV[isin] || []).length || 0) + ' pts</div></div>';
-    }).join('');
-    el.querySelectorAll('.toggle:not([disabled])').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const isin = btn.getAttribute('data-isin');
-        state.active[isin] = !(state.active[isin] !== false);
-        saveSlots(); renderAll();
-      });
-    });
-  }
-
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-    const page = document.getElementById('page-' + id);
-    if (page) page.classList.add('active');
     const tab = document.querySelector('.tab[data-page="' + id + '"]');
     if (tab) tab.classList.add('active');
     if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
@@ -36,6 +19,11 @@
     });
     document.getElementById('sel-filter').addEventListener('change', (e) => {
       state.filter = e.target.value; saveUi(); renderAll();
+    });
+    const tk = document.getElementById('sel-topk');
+    if (tk) tk.addEventListener('change', (e) => {
+      state.topK = parseInt(e.target.value, 10) === 2 ? 2 : 1;
+      saveUi(); renderAll();
     });
   }
 
