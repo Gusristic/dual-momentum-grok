@@ -1,7 +1,4 @@
-      if (elig.length > 1) rotatedMeta = { delta: elig[0].score - elig[1].score, second: elig[1].isin };
-    }
-    return {
-      date: DATES[i], pick, pickScore, reason, rows: ordered, eligCount: elig.length, rotatedMeta,
+      date: DATES[i], pick, pickScore, picks, reason, rows: ordered, eligCount: elig.length, rotatedMeta,
       cashScore: scoreAt(modelId, cash, i), cashR12: retAt(cash, i, 12),
     };
   }
@@ -30,38 +27,77 @@
     const start = 12, end = lastValidIndex();
     if (end < start) return { equity: [], signals: [], metrics: null };
     const signals = [];
-    let holding = null, eq = 1.0;
+    let holdingPicks = null, eq = 1.0;
     const equity = [];
+    const useTopK = (state.topK || 1) >= 2;
     for (let i = start; i <= end; i++) {
       const rk = rankAt(modelId, filterMode, i);
-      let target = rk.pick, reason = rk.reason, rotated = false;
-      if (holding == null) {
-        rotated = true; reason = 'primera asignación · ' + reason; holding = target;
-      } else if (target === holding) {
-        rotated = false; reason = 'mantener (mismo top-1)';
-      } else {
-        const mNew = scoreAt(modelId, target, i), mOld = scoreAt(modelId, holding, i);
-        if (mOld == null || mNew == null) {
-          rotated = true; reason = 'rotar (dato ausente)'; holding = target;
-        } else if (mNew - mOld > META.rotationThreshold) {
-          rotated = true;
-          reason = 'rotar · Δ ' + (mNew - mOld).toFixed(4) + ' > umbral';
-          holding = target;
-        } else {
+      let targetPicks = rk.picks.map((p) => ({ isin: p.isin, score: p.score, w: p.w }));
+      let reason = rk.reason, rotated = false;
+      if (holdingPicks == null) {
+        rotated = true;
+        reason = 'primera asignación · ' + reason;
+        holdingPicks = targetPicks;
+      } else if (useTopK) {
+        const same =
+          holdingPicks.length === targetPicks.length &&
+          holdingPicks.every((h, idx) => h.isin === targetPicks[idx].isin);
+        if (same) {
           rotated = false;
-          reason = 'mantener · Δ ' + (mNew - mOld).toFixed(4) + ' ≤ umbral';
-          target = holding;
+          reason = 'mantener top-' + targetPicks.length;
+        } else {
+          rotated = true;
+          reason = 'rebalance top-' + targetPicks.length + ' · ' + reason;
+          holdingPicks = targetPicks;
+        }
+      } else {
+        let target = targetPicks[0].isin;
+        const holding = holdingPicks[0].isin;
+        if (target === holding) {
+          rotated = false;
+          reason = 'mantener (mismo top-1)';
+        } else {
+          const mNew = scoreAt(modelId, target, i), mOld = scoreAt(modelId, holding, i);
+          if (mOld == null || mNew == null) {
+            rotated = true;
+            reason = 'rotar (dato ausente)';
+            holdingPicks = targetPicks;
+          } else if (mNew - mOld > META.rotationThreshold) {
+            rotated = true;
+            reason = 'rotar · Δ ' + (mNew - mOld).toFixed(4) + ' > umbral';
+            holdingPicks = targetPicks;
+          } else {
+            rotated = false;
+            reason = 'mantener · Δ ' + (mNew - mOld).toFixed(4) + ' ≤ umbral';
+            targetPicks = holdingPicks;
+          }
         }
       }
       if (i > start) {
-        const prev = signals[signals.length - 1].asset_isin;
-        const a = SERIES[prev][i - 1], b = SERIES[prev][i];
-        if (a != null && b != null && a !== 0) eq *= b / a;
+        const prev = signals[signals.length - 1].picks;
+        let portRet = 0, wSum = 0;
+        for (const p of prev) {
+          const a = SERIES[p.isin][i - 1], b = SERIES[p.isin][i];
+          if (a != null && b != null && a !== 0) {
+            portRet += p.w * (b / a - 1);
+            wSum += p.w;
+          }
+        }
+        if (wSum > 0) eq *= 1 + portRet;
         equity.push({ d: DATES[i], v: eq });
       } else equity.push({ d: DATES[i], v: 1.0 });
+      const label = targetPicks.map((p) => short(p.isin) + (targetPicks.length > 1 ? ' ' + Math.round(p.w * 100) + '%' : '')).join(' + ');
       signals.push({
-        date: DATES[i], asset_isin: target, score: scoreAt(modelId, target, i),
-        rotated, reason, r12: retAt(target, i, 12), r6: retAt(target, i, 6), r3: retAt(target, i, 3),
+        date: DATES[i],
+        asset_isin: targetPicks[0].isin,
+        picks: targetPicks,
+        label,
+        score: targetPicks[0].score,
+        rotated,
+        reason,
+        r12: retAt(targetPicks[0].isin, i, 12),
+        r6: retAt(targetPicks[0].isin, i, 6),
+        r3: retAt(targetPicks[0].isin, i, 3),
       });
     }
     return { equity, signals, metrics: computeMetrics(equity) };
@@ -83,22 +119,3 @@
       for (const x of a) if (mapB.has(x.i)) { xs.push(x.v); ys.push(mapB.get(x.i)); }
       if (xs.length < 24) return null;
       const n = xs.length;
-      const mx = xs.reduce((p, c) => p + c, 0) / n, my = ys.reduce((p, c) => p + c, 0) / n;
-      let num = 0, dx = 0, dy = 0;
-      for (let i = 0; i < n; i++) {
-        const ax = xs[i] - mx, ay = ys[i] - my;
-        num += ax * ay; dx += ax * ax; dy += ay * ay;
-      }
-      return dx === 0 || dy === 0 ? null : num / Math.sqrt(dx * dy);
-    }
-    const matrix = {};
-    for (const a of isins) {
-      matrix[a] = {};
-      for (const b of isins) matrix[a][b] = a === b ? 1 : corr(rets[a], rets[b]);
-    }
-    return { isins, matrix };
-  }
-
-  function loadSlots() {
-    let saved = null;
-    try { saved = JSON.parse(localStorage.getItem(STORAGE) || 'null'); } catch (e) {}
