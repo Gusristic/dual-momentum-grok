@@ -27,11 +27,13 @@ window.DM = {
     IE00BYX5N771: '0P0001CLDI.F', IE0007472990: '0P00000RQE.F',
     IE0007471927: '0P00000RNB', LU1578889864: '0P0001A2G4.F',
   },
+  dataAsOf: '2026-08-31',
+  dataScraped: '2026-09-21',
   metrics: { cagr: 0.3684, vol: 0.1963, sharpe: 1.877, max_dd: -0.2517, n_obs: 105, total_return: 14.552 },
   signal: {
-    date: '2026-09-30', asset_isin: 'IE00BYX5N771', name: 'Fidelity Japan',
-    m_composite: 0.2141, r12: 0.2856, r6: 0.2057, r3: 0.0481,
-    reason: 'mantener (mismo top-1)',
+    date: '2026-08-31', asset_isin: 'IE00BYX5N771', name: 'Fidelity Japan',
+    m_composite: 0.17, r12: 0.0, r6: 0.0, r3: 0.0,
+    reason: 'mes cerrado 2026-08-31 (datos Yahoo refresados 2026-09-21)',
   },
   recent: [
     { date: '2026-04-30', name: 'Ninety One Gold', m: 0.472, rotated: false },
@@ -39,6 +41,5 @@ window.DM = {
     { date: '2026-06-30', name: 'iShares EM', m: 0.374, rotated: true },
     { date: '2026-07-31', name: 'Fidelity Japan', m: 0.213, rotated: true },
     { date: '2026-08-31', name: 'Fidelity Japan', m: 0.17, rotated: false },
-    { date: '2026-09-30', name: 'Fidelity Japan', m: 0.214, rotated: false },
   ],
 };

@@ -55,4 +55,6 @@ window.DM_META = {
     agresivo: { id: 'agresivo', name: 'Agresivo 20-30-50', w12: 0.2, w6: 0.3, w3: 0.5, kind: 'weighted' },
   },
   rotationThreshold: 0.005,
+  dataAsOf: '2026-08-31',
+  dataScraped: '2026-09-21',
 };
