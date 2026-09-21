@@ -1,3 +1,12 @@
+    const eligScores = rk.rows.filter((r) => r.eligible && r.score != null);
+    rk.rows.forEach((r, idx) => {
+      const isWin = r.eligible && idx === 0 && eligScores.length;
+      let delta = '—';
+      if (r.eligible && r.score != null && eligScores.length) {
+        if (idx === 0 && eligScores.length > 1) delta = '+' + ((r.score - eligScores[1].score) * 100).toFixed(2) + ' pp';
+        else if (idx > 0) delta = ((r.score - eligScores[0].score) * 100).toFixed(2) + ' pp';
+      }
+      html += '<tr class="' + (isWin ? 'winner' : '') + '"><td>' + r.rank +
         '</td><td class="name-cell">' + short(r.isin) + '<span class="isin-sub">' + name(r.isin) +
         ' · ' + r.isin + '</span></td><td class="num">' +
         (r.score != null ? (r.score * 100).toFixed(2) + '%' : '—') +
@@ -77,7 +86,7 @@
     drawChart(bt.equity, benchEq);
     const tbody = document.querySelector('#bt-history tbody');
     tbody.innerHTML = bt.signals.slice(-18).reverse().map((s) =>
-      '<tr><td class="num">' + s.date + '</td><td class="name-cell">' + short(s.asset_isin) +
+      '<tr><td class="num">' + s.date + '</td><td class="name-cell">' + (s.label || short(s.asset_isin)) +
       '</td><td>' + (s.rotated ? '↻' : '·') + '</td><td class="num">' +
       (s.score != null ? (s.score * 100).toFixed(2) + '%' : '—') +
       '</td><td class="muted small">' + s.reason + '</td></tr>'
@@ -86,3 +95,5 @@
 
   function drawChart(equity, benchEq) {
     const canvas = document.getElementById('bt-chart');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;

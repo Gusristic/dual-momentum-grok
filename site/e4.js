@@ -1,5 +1,3 @@
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
     const w = canvas.clientWidth || 640, h = 220;
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -90,3 +88,20 @@
         (isCash ? ' disabled title="Cash siempre activo"' : '') + '></button>' +
         '<div style="flex:1"><div class="slot-name">' + short(isin) + (isCash ? ' · cash' : '') +
         '</div><div class="slot-isin">' + name(isin) + ' · ' + isin + ' · Yahoo ' +
+        (META.yahooMap[isin] || '—') + '</div></div>' +
+        '<div class="num muted small">' + ((NAV[isin] || []).length || 0) + ' pts</div></div>';
+    }).join('');
+    el.querySelectorAll('.toggle:not([disabled])').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const isin = btn.getAttribute('data-isin');
+        state.active[isin] = !(state.active[isin] !== false);
+        saveSlots(); renderAll();
+      });
+    });
+  }
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+    const page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
