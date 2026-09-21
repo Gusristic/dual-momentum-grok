@@ -3,7 +3,7 @@
   const STORAGE = 'dm_v2_slots';
   const STORAGE_UI = 'dm_v2_ui';
   let NAV = {}, DATES = [], SERIES = {}, BENCH = null;
-  const state = { model: 'equilibrado', filter: 'score', active: {} };
+  const state = { model: 'equilibrado', filter: 'score', topK: 1, active: {} };
 
   const pct = (x) => (x == null || Number.isNaN(x) ? '—' : (x * 100).toFixed(1) + '%');
   const pctClass = (x) => (x == null || Number.isNaN(x) ? '' : x >= 0 ? 'pos' : 'neg');
@@ -107,7 +107,22 @@
     ordered.forEach((r, idx) => { r.rank = idx + 1; });
     let pick = cash, reason = 'ningún activo pasó filtro → cash';
     let pickScore = scoreAt(modelId, cash, i), rotatedMeta = null;
+    const picks = [];
     if (elig.length) {
-      pick = elig[0].isin;
-      pickScore = elig[0].score;
-      reason = 'top-1 por score entre elegibles';
+      const k = Math.min(state.topK || 1, elig.length);
+      for (let t = 0; t < k; t++) {
+        picks.push({ isin: elig[t].isin, score: elig[t].score, w: 1 / k });
+      }
+      pick = picks[0].isin;
+      pickScore = picks[0].score;
+      if (k === 1) {
+        reason = 'top-1 por score entre elegibles';
+        if (elig.length > 1) rotatedMeta = { delta: elig[0].score - elig[1].score, second: elig[1].isin };
+      } else {
+        reason = 'top-' + k + ' equal weight (' + picks.map((p) => short(p.isin)).join(' + ') + ')';
+        if (elig.length > k) rotatedMeta = { delta: elig[k - 1].score - elig[k].score, second: elig[k].isin };
+      }
+    } else {
+      picks.push({ isin: cash, score: pickScore, w: 1 });
+    }
+    return {
