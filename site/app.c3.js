@@ -1,6 +1,10 @@
-    ctx.fillStyle = '#5c6b80'; ctx.font = '10px JetBrains Mono, monospace';
-    ctx.fillText(equity[0].d.slice(0, 7), pad.l, h - 8);
-    ctx.fillText(equity[equity.length - 1].d.slice(0, 7), w - pad.r - 48, h - 8);
+    ctx.font = '10px DM Sans, sans-serif';
+    ctx.fillStyle = '#3d9cf0'; ctx.fillRect(pad.l, 4, 10, 3);
+    ctx.fillStyle = '#8b9bb0'; ctx.fillText('Estrategia', pad.l + 14, 10);
+    if (benchEq) {
+      ctx.fillStyle = '#fbbf24'; ctx.fillRect(pad.l + 90, 4, 10, 3);
+      ctx.fillStyle = '#8b9bb0'; ctx.fillText('MSCI World', pad.l + 104, 10);
+    }
   }
 
   function renderCorr() {
