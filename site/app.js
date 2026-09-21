@@ -1,5 +1,5 @@
 (function(){
-  var files=['e0.js','e1.js','e2.js','e3.js'];
+  var files=['e0.js','e1.js','e2.js','e3.js','e4.js','e5.js','e6.js','e7.js'];
   Promise.all(files.map(function(s){
     return fetch(s,{cache:'no-store'}).then(function(r){
       if(!r.ok) throw new Error(s); return r.text();
