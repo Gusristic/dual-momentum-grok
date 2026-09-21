@@ -1,99 +1,143 @@
-    const eligScores = rk.rows.filter((r) => r.eligible && r.score != null);
-    rk.rows.forEach((r, idx) => {
-      const isWin = r.eligible && idx === 0 && eligScores.length;
-      let delta = '—';
-      if (r.eligible && r.score != null && eligScores.length) {
-        if (idx === 0 && eligScores.length > 1) delta = '+' + ((r.score - eligScores[1].score) * 100).toFixed(2) + ' pp';
-        else if (idx > 0) delta = ((r.score - eligScores[0].score) * 100).toFixed(2) + ' pp';
-      }
-      html += '<tr class="' + (isWin ? 'winner' : '') + '"><td>' + r.rank +
-        '</td><td class="name-cell">' + short(r.isin) + '<span class="isin-sub">' + name(r.isin) +
-        ' · ' + r.isin + '</span></td><td class="num">' +
-        (r.score != null ? (r.score * 100).toFixed(2) + '%' : '—') +
-        '</td><td class="num ' + pctClass(r.r12) + '">' + pct(r.r12) +
-        '</td><td class="num ' + pctClass(r.r6) + '">' + pct(r.r6) +
-        '</td><td class="num ' + pctClass(r.r3) + '">' + pct(r.r3) +
-        '</td><td><span class="badge ' + (r.eligible ? 'ok' : 'no') + '">' +
-        (r.eligible ? 'sí' : 'no') + '</span></td><td class="num">' + delta + '</td></tr>';
+      const x = pad.l + (iw * idx) / (equity.length - 1);
+      const y = pad.t + ih * (1 - (e.v - min) / (max - min));
+      if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
-    tbody.innerHTML = html;
-  }
-
-  function renderVentanas() {
-    const i = lastValidIndex();
-    document.getElementById('ventanas-asof').textContent =
-      'Última fecha NAV: ' + DATES[i] + ' · puntos Yahoo 1mo';
-    const tbody = document.querySelector('#ventanas-table tbody');
-    const rows = META.defaultIsins.filter((x) => SERIES[x]).map((isin) => {
-      const r12 = retAt(isin, i, 12), r6 = retAt(isin, i, 6), r3 = retAt(isin, i, 3);
-      const sc = r12 != null && r6 != null && r3 != null ? 0.5 * r12 + 0.3 * r6 + 0.2 * r3 : null;
-      return { isin, r12, r6, r3, sc, pts: (NAV[isin] || []).length };
-    });
-    rows.sort((a, b) => (b.sc ?? -999) - (a.sc ?? -999));
-    tbody.innerHTML = rows.map((r) =>
-      '<tr' + (r.isin === META.cashIsin ? ' class="cash-row"' : '') +
-      '><td class="name-cell">' + short(r.isin) + '<span class="isin-sub">' + name(r.isin) +
-      '</span></td><td class="num ' + pctClass(r.r12) + '">' + pct(r.r12) +
-      '</td><td class="num ' + pctClass(r.r6) + '">' + pct(r.r6) +
-      '</td><td class="num ' + pctClass(r.r3) + '">' + pct(r.r3) +
-      '</td><td class="num">' + (r.sc != null ? (r.sc * 100).toFixed(2) + '%' : '—') +
-      '</td><td class="num">' + r.pts + '</td></tr>'
-    ).join('');
-  }
-
-
-  function buildBenchEquity(equity) {
-    if (!BENCH || !equity || equity.length < 2) return null;
-    const startYm = equity[0].d.slice(0, 7);
-    const startIdx = DATES.indexOf(startYm);
-    if (startIdx < 0 || BENCH[startIdx] == null || BENCH[startIdx] === 0) return null;
-    const base = BENCH[startIdx];
-    return equity.map((e) => {
-      const i = DATES.indexOf(e.d.slice(0, 7));
-      if (i < 0 || BENCH[i] == null) return { d: e.d, v: null };
-      return { d: e.d, v: BENCH[i] / base };
-    });
-  }
-
-  function renderBacktest() {
-    const bt = runBacktest(state.model, state.filter);
-    const m = bt.metrics;
-    const grid = document.getElementById('bt-metrics');
-    if (!m) { grid.innerHTML = '<div class="metric"><div class="k">Sin datos</div></div>'; return; }
-    const benchEq = buildBenchEquity(bt.equity);
-    let benchCagr = null, benchTotal = null;
-    if (benchEq) {
-      const valid = benchEq.filter((e) => e.v != null);
-      if (valid.length >= 2) {
-        const years = (valid.length - 1) / 12;
-        benchTotal = valid[valid.length - 1].v / valid[0].v - 1;
-        benchCagr = years > 0 ? Math.pow(valid[valid.length - 1].v / valid[0].v, 1 / years) - 1 : null;
-      }
+    ctx.strokeStyle = '#3d9cf0'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.lineTo(pad.l + iw, pad.t + ih); ctx.lineTo(pad.l, pad.t + ih); ctx.closePath();
+    const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ih);
+    grad.addColorStop(0, 'rgba(61,156,240,0.35)'); grad.addColorStop(1, 'rgba(61,156,240,0)');
+    ctx.fillStyle = grad; ctx.fill();
+    if (benchEq && benchEq.length === equity.length) {
+      ctx.beginPath();
+      let started = false;
+      benchEq.forEach((e, idx) => {
+        if (e.v == null) return;
+        const x = pad.l + (iw * idx) / (equity.length - 1);
+        const y = pad.t + ih * (1 - (e.v - min) / (max - min));
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.75; ctx.setLineDash([5, 4]); ctx.stroke();
+      ctx.setLineDash([]);
     }
-    const items = [
-      ['CAGR', m.cagr != null ? (m.cagr * 100).toFixed(1) + '%' : '—'],
-      ['Vol', (m.vol * 100).toFixed(1) + '%'],
-      ['Sharpe', m.sharpe != null ? m.sharpe.toFixed(2) : '—'],
-      ['Max DD', (m.max_dd * 100).toFixed(1) + '%'],
-      ['Total', (m.total_return * 100).toFixed(0) + '%'],
-      ['Meses', String(m.n_obs)],
-      ['World CAGR', benchCagr != null ? (benchCagr * 100).toFixed(1) + '%' : '—'],
-      ['World Tot', benchTotal != null ? (benchTotal * 100).toFixed(0) + '%' : '—'],
-    ];
-    grid.innerHTML = items.map(([k, v]) =>
-      '<div class="metric"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'
-    ).join('');
-    drawChart(bt.equity, benchEq);
-    const tbody = document.querySelector('#bt-history tbody');
-    tbody.innerHTML = bt.signals.slice(-18).reverse().map((s) =>
-      '<tr><td class="num">' + s.date + '</td><td class="name-cell">' + (s.label || short(s.asset_isin)) +
-      '</td><td>' + (s.rotated ? '↻' : '·') + '</td><td class="num">' +
-      (s.score != null ? (s.score * 100).toFixed(2) + '%' : '—') +
-      '</td><td class="muted small">' + s.reason + '</td></tr>'
-    ).join('');
+    ctx.fillStyle = '#5c6b80'; ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(equity[0].d.slice(0, 7), pad.l, h - 8);
+    ctx.fillText(equity[equity.length - 1].d.slice(0, 7), w - pad.r - 48, h - 8);
+    ctx.font = '10px DM Sans, sans-serif';
+    ctx.fillStyle = '#3d9cf0'; ctx.fillRect(pad.l, 4, 10, 3);
+    ctx.fillStyle = '#8b9bb0'; ctx.fillText('Estrategia', pad.l + 14, 10);
+    if (benchEq) {
+      ctx.fillStyle = '#fbbf24'; ctx.fillRect(pad.l + 90, 4, 10, 3);
+      ctx.fillStyle = '#8b9bb0'; ctx.fillText('MSCI World', pad.l + 104, 10);
+    }
   }
 
-  function drawChart(equity, benchEq) {
-    const canvas = document.getElementById('bt-chart');
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
+  function renderCorr() {
+    const { isins, matrix } = correlationMatrix();
+    let html = '<table class="data-table corr-table"><thead><tr><th></th>';
+    isins.forEach((i) => { html += '<th>' + short(i).slice(0, 10) + '</th>'; });
+    html += '</tr></thead><tbody>';
+    isins.forEach((a) => {
+      html += '<tr><td class="name-cell">' + short(a) + '</td>';
+      isins.forEach((b) => {
+        const c = matrix[a][b];
+        let bg = 'transparent', tx = '—';
+        if (c != null) {
+          tx = c.toFixed(2);
+          const t = Math.max(-1, Math.min(1, c));
+          bg = t >= 0
+            ? 'rgba(52, 211, 153,' + (0.08 + t * 0.45) + ')'
+            : 'rgba(248, 113, 113,' + (0.08 + -t * 0.45) + ')';
+        }
+        html += '<td class="num" style="background:' + bg + '">' + tx + '</td>';
+      });
+      html += '</tr>';
+    });
+    document.getElementById('corr-wrap').innerHTML = html + '</tbody></table>';
+  }
+
+  function renderSlots() {
+    const el = document.getElementById('slots-list');
+    el.innerHTML = META.defaultIsins.map((isin) => {
+      const isCash = isin === META.cashIsin, on = state.active[isin] !== false;
+      return '<div class="slot' + (on ? '' : ' disabled') + '">' +
+        '<button type="button" class="toggle' + (on ? ' on' : '') + '" data-isin="' + isin + '"' +
+        (isCash ? ' disabled title="Cash siempre activo"' : '') + '></button>' +
+        '<div style="flex:1"><div class="slot-name">' + short(isin) + (isCash ? ' · cash' : '') +
+        '</div><div class="slot-isin">' + name(isin) + ' · ' + isin + ' · Yahoo ' +
+        (META.yahooMap[isin] || '—') + '</div></div>' +
+        '<div class="num muted small">' + ((NAV[isin] || []).length || 0) + ' pts</div></div>';
+    }).join('');
+    el.querySelectorAll('.toggle:not([disabled])').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const isin = btn.getAttribute('data-isin');
+        state.active[isin] = !(state.active[isin] !== false);
+        saveSlots(); renderAll();
+      });
+    });
+  }
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+    const page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
+    const tab = document.querySelector('.tab[data-page="' + id + '"]');
+    if (tab) tab.classList.add('active');
+    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+    if (id === 'backtest') setTimeout(() => renderBacktest(), 30);
+  }
+
+  function initNav() {
+    document.querySelectorAll('.tab').forEach((t) => {
+      t.addEventListener('click', () => showPage(t.getAttribute('data-page')));
+    });
+    showPage((location.hash || '#decision').replace('#', '') || 'decision');
+    window.addEventListener('hashchange', () =>
+      showPage((location.hash || '#decision').replace('#', '') || 'decision')
+    );
+  }
+  function initControls() {
+    document.getElementById('sel-model').addEventListener('change', (e) => {
+      state.model = e.target.value; saveUi(); renderAll();
+    });
+    document.getElementById('sel-filter').addEventListener('change', (e) => {
+      state.filter = e.target.value; saveUi(); renderAll();
+    });
+    const tk = document.getElementById('sel-topk');
+    if (tk) tk.addEventListener('change', (e) => {
+      state.topK = parseInt(e.target.value, 10) === 2 ? 2 : 1;
+      saveUi(); renderAll();
+    });
+    const copyBtn = document.getElementById('checklist-copy');
+    if (copyBtn) copyBtn.addEventListener('click', () => {
+      const line = buildChecklistLine();
+      if (!line) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(line).then(() => {
+          copyBtn.textContent = 'Copiado';
+          setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = line; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); copyBtn.textContent = 'Copiado'; } catch (e) {}
+        document.body.removeChild(ta);
+        setTimeout(() => { copyBtn.textContent = 'Copiar línea'; }, 1500);
+      }
+    });
+  }
+
+  async function boot() {
+    loadSlots(); loadUi(); initNav(); initControls();
+    try {
+      await loadNav();
+      renderAll();
+    } catch (err) {
+      document.querySelector('.main').innerHTML =
+        '<div class="warn"><strong>Error:</strong> ' + (err.message || err) +
+        '. Comprueba site/nav/*.json en GitHub Pages.</div>';
+    }
+  }
+  boot();
+})();
