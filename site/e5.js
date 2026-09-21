@@ -1,14 +1,3 @@
-        state.active[isin] = !(state.active[isin] !== false);
-        saveSlots(); renderAll();
-      });
-    });
-  }
-
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-    const page = document.getElementById('page-' + id);
-    if (page) page.classList.add('active');
     const tab = document.querySelector('.tab[data-page="' + id + '"]');
     if (tab) tab.classList.add('active');
     if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
