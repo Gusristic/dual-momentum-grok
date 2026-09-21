@@ -96,33 +96,3 @@
         r12: retAt(isin, i, 12),
         r6: retAt(isin, i, 6),
         r3: retAt(isin, i, 3),
-        eligible: eligible(modelId, filterMode, isin, cash, i),
-      });
-    }
-    const elig = rows.filter((r) => r.eligible && r.score != null);
-    const rest = rows.filter((r) => !r.eligible || r.score == null);
-    elig.sort((a, b) => b.score - a.score);
-    rest.sort((a, b) => (b.score ?? -999) - (a.score ?? -999));
-    const ordered = elig.concat(rest);
-    ordered.forEach((r, idx) => { r.rank = idx + 1; });
-    let pick = cash, reason = 'ningún activo pasó filtro → cash';
-    let pickScore = scoreAt(modelId, cash, i), rotatedMeta = null;
-    const picks = [];
-    if (elig.length) {
-      const k = Math.min(state.topK || 1, elig.length);
-      for (let t = 0; t < k; t++) {
-        picks.push({ isin: elig[t].isin, score: elig[t].score, w: 1 / k });
-      }
-      pick = picks[0].isin;
-      pickScore = picks[0].score;
-      if (k === 1) {
-        reason = 'top-1 por score entre elegibles';
-        if (elig.length > 1) rotatedMeta = { delta: elig[0].score - elig[1].score, second: elig[1].isin };
-      } else {
-        reason = 'top-' + k + ' equal weight (' + picks.map((p) => short(p.isin)).join(' + ') + ')';
-        if (elig.length > k) rotatedMeta = { delta: elig[k - 1].score - elig[k].score, second: elig[k].isin };
-      }
-    } else {
-      picks.push({ isin: cash, score: pickScore, w: 1 });
-    }
-    return {
