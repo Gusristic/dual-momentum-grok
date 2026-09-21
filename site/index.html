@@ -9,6 +9,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    .preset-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn-preset {
+      background: #1a2230; color: #e8eef7; border: 1px solid #2a3548;
+      border-radius: 10px; padding: 10px 14px; font: 600 13px/1.2 "DM Sans", system-ui, sans-serif;
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .btn-preset:hover { border-color: #3d9cf0; background: #1e2a3d; }
+    .btn-preset.active { border-color: #3d9cf0; background: rgba(61,156,240,.15); color: #7ec4ff; }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -152,11 +162,23 @@
           <p class="lede">Activa o desactiva fondos. El cash no se puede desactivar. Los cambios recalculan señales y backtest.</p>
         </div>
         <div class="card">
+          <h2>Presets de universo</h2>
+          <p class="muted small" style="margin-bottom:12px">Aplican activar/desactivar slots y recalculan señales y backtest. Cash siempre activo.</p>
+          <div class="preset-row" id="preset-row">
+            <button type="button" class="btn-preset" data-preset="all">Todos (12)</button>
+            <button type="button" class="btn-preset" data-preset="gem">GEM-like</button>
+            <button type="button" class="btn-preset" data-preset="no_gold">Multi-asset sin oro</button>
+            <button type="button" class="btn-preset" data-preset="equity_only">Solo RV + cash</button>
+          </div>
+          <div class="muted small" id="preset-hint" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
           <h2>Instrucciones</h2>
           <ul class="bullets">
             <li>Marca/desmarca el interruptor de cada fondo para incluirlo o excluirlo del ranking y del backtest.</li>
             <li>El cash (Groupama Trésorerie) es el puerto seguro del filtro absoluto; siempre activo.</li>
-            <li>Para añadir un ISIN nuevo hace falta serie Yahoo en <code>nav/</code>; aquí se gestionan los 12 cargados.</li>
+            <li><strong>GEM-like</strong>: S&amp;P 500 + Europe + EM + € Bond + Cash (estilo Antonacci simplificado).</li>
+            <li><strong>Multi-asset sin oro</strong>: quita Gold, Nasdaq (solapa S&amp;P), CROCI y US Govt $ (FX).</li>
             <li>Preferencias se guardan en este navegador (localStorage).</li>
           </ul>
         </div>
@@ -199,5 +221,78 @@
   </div>
   <script src="meta.js"></script>
   <script src="app.js"></script>
+
+  <script>
+  (function () {
+    var STORAGE = 'dm_v2_slots';
+    var CASH = 'FR0000989626';
+    var ALL = [
+      'IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39',
+      'IE00B42W3S00','LU1278917452','ES0165265002','FR0000989626',
+      'IE00BYX5N771','IE0007472990','IE0007471927','LU1578889864'
+    ];
+    var PRESETS = {
+      all: {
+        label: 'Todos (12)',
+        on: ALL,
+        hint: 'Universo completo: RV regional + estilos + bonos + oro + cash.'
+      },
+      gem: {
+        label: 'GEM-like',
+        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BYWYCC39','IE0007472990','FR0000989626'],
+        hint: 'S&P 500 + Europe + EM + € Govt Bond + Cash. Cercano a dual momentum clásico (pocos bloques).'
+      },
+      no_gold: {
+        label: 'Multi-asset sin oro',
+        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','IE0007472990','FR0000989626'],
+        hint: 'Sin Gold, Nasdaq, CROCI ni US Govt $. Menos solapes y menos riesgo de rachas extremas.'
+      },
+      equity_only: {
+        label: 'Solo RV + cash',
+        on: ['IE00BYX5MX67','IE00BYX5MD61','IE00BDRK7R97','IE00BYWYCC39','IE00B42W3S00','IE00BYX5N771','FR0000989626'],
+        hint: 'Solo renta variable regional/estilo + cash. Sin bonos ni oro.'
+      }
+    };
+
+    function applyPreset(id) {
+      var p = PRESETS[id];
+      if (!p) return;
+      var active = {};
+      ALL.forEach(function (isin) {
+        active[isin] = p.on.indexOf(isin) >= 0 || isin === CASH;
+      });
+      active[CASH] = true;
+      localStorage.setItem(STORAGE, JSON.stringify(active));
+      localStorage.setItem('dm_v2_preset', id);
+      var hash = location.hash || '#universo';
+      location.hash = hash;
+      location.reload();
+    }
+
+    function markActive() {
+      var cur = localStorage.getItem('dm_v2_preset') || '';
+      document.querySelectorAll('.btn-preset').forEach(function (btn) {
+        var id = btn.getAttribute('data-preset');
+        btn.classList.toggle('active', id === cur);
+        if (id === cur && PRESETS[id]) {
+          var h = document.getElementById('preset-hint');
+          if (h) h.textContent = PRESETS[id].hint;
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var row = document.getElementById('preset-row');
+      if (!row) return;
+      row.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-preset');
+        if (!btn) return;
+        applyPreset(btn.getAttribute('data-preset'));
+      });
+      markActive();
+    });
+  })();
+  </script>
+
 </body>
 </html>
