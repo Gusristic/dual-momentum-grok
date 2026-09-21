@@ -47,6 +47,13 @@
             <option value="r12">B · Solo R12 vs cash</option>
           </select>
         </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Asignación</span>
+          <select id="sel-topk" class="select">
+            <option value="1" selected>Top-1 (100%)</option>
+            <option value="2">Top-2 (50/50)</option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -64,7 +71,7 @@
       <section id="page-decision" class="page active">
         <div class="page-head">
           <h1>Señal y comparación</h1>
-          <p class="lede">Top-1 según modelo y filtro activos. Los 4 modelos se recalculan al cambiar el filtro cash.</p>
+          <p class="lede">Asignación Top-1 o Top-2 según modelo y filtro. Cambia el selector «Asignación» para recalcular señales y backtest.</p>
         </div>
         <div class="grid-models" id="decision-cards"></div>
         <div class="card" id="decision-detail">
@@ -123,7 +130,7 @@
       <section id="page-backtest" class="page">
         <div class="page-head">
           <h1>Backtest</h1>
-          <p class="lede">Equity desde el primer rebalance válido (mes ≥13). Métricas del modelo y filtro seleccionados.</p>
+          <p class="lede">Equity desde el primer rebalance válido (mes ≥13). Métricas del modelo, filtro y asignación (Top-1 / Top-2) seleccionados.</p>
         </div>
         <div class="metrics-row" id="bt-metrics"></div>
         <div class="card chart-card">
@@ -199,12 +206,13 @@
           </ul>
         </div>
         <div class="card">
-          <h2>Filtro de elegibilidad vs cash</h2>
+          <h2>Filtro y asignación</h2>
           <ul class="bullets">
-            <li><strong>A · Score ponderado</strong>: score(activo) > score(cash) con la misma fórmula del modelo.</li>
-            <li><strong>B · Solo R12</strong>: R12(activo) > R12(cash) (estilo Antonacci clásico).</li>
+            <li><strong>A · Score ponderado</strong>: score(activo) &gt; score(cash) con la misma fórmula del modelo.</li>
+            <li><strong>B · Solo R12</strong>: R12(activo) &gt; R12(cash) (estilo Antonacci clásico).</li>
             <li>Si nadie pasa el filtro → 100% cash.</li>
-            <li>Asignación: top-1 = 100%. Umbral de rotación 0,5% en score.</li>
+            <li><strong>Top-1</strong>: 100% al mejor elegible; umbral de rotación 0,5% en score.</li>
+            <li><strong>Top-2</strong>: 50/50 a los dos mejores elegibles; rebalance mensual (si solo hay 1 elegible → 100%).</li>
           </ul>
         </div>
         <div class="card">
