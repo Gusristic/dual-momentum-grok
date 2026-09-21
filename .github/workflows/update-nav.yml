@@ -1,0 +1,35 @@
+name: Update NAV daily
+
+on:
+  schedule:
+    # 06:15 UTC cada día (≈ 08:15 CEST / 07:15 CET)
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-nav
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Yahoo monthly NAV
+        run: python3 scripts/update_nav.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/nav/
+          if git diff --staged --quiet; then
+            echo "Sin cambios en NAV"
+          else
+            git commit -m "data: update monthly NAV from Yahoo $(date -u +%Y-%m-%d)"
+            git push
+          fi
